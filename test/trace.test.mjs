@@ -1,6 +1,6 @@
 // Offline check of the trace engine on the demo data (no Atlassian site needed):  node test/trace.test.mjs
 import assert from 'node:assert/strict';
-import { buildMatrix, explainForAgent } from '../src/trace.js';
+import { buildMatrix, explainForAgent, pageModel } from '../src/trace.js';
 import { DEMO_ITEMS, KIND_LABEL, DEMO_VERSION } from '../src/demo.js';
 
 // Turn demo items into the engine's issue shape, with Jira-like keys and two-way links.
@@ -35,6 +35,16 @@ assert.equal(m.summary.requirements, 8);
 assert.equal(m.summary.verified, 4);
 assert.equal(m.summary.coveragePercent, 50);
 assert.equal(m.summary.releaseReady, false);
+
+// Jira page model: picks the newest release by default, '' means all requirements, gap texts attached.
+const page = pageModel(issues);
+assert.equal(page.version, DEMO_VERSION);
+assert.deepEqual(page.versions, [DEMO_VERSION]);
+assert.equal(page.summary.verified, 4);
+assert.equal(page.rows.find((r) => r.summary.startsWith('Low battery')).gapText[0], 'No test verifies this requirement');
+assert.equal(pageModel(issues, '').version, '');
+assert.equal(pageModel(issues, '').summary.requirements, 8);
+assert.equal(pageModel(issues, 'v9.9').summary.requirements, 0);
 
 console.log(explainForAgent(m, { project: 'IPC', version: DEMO_VERSION }));
 console.log('\nAll trace engine checks passed.');
