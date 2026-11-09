@@ -152,6 +152,27 @@ function countGaps(rows, risks) {
   return counts;
 }
 
+/**
+ * Everything the Jira project page shows, in one plain object.
+ * requestedVersion: undefined = pick the newest release automatically, '' = all requirements, else a release name.
+ */
+export function pageModel(issues, requestedVersion) {
+  const versions = [...new Set(issues.filter((i) => kindOf(i) === 'req').flatMap((i) => i.versions || []))].sort();
+  const version =
+    requestedVersion === undefined || requestedVersion === null
+      ? versions[versions.length - 1] || ''
+      : String(requestedVersion);
+  const matrix = buildMatrix(issues, { version: version || undefined });
+  const withText = (item) => ({ ...item, gapText: item.gaps.map((g) => GAPS[g]) });
+  return {
+    version,
+    versions,
+    summary: matrix.summary,
+    rows: matrix.rows.map(withText),
+    risks: matrix.risks.map(withText),
+  };
+}
+
 /** Short plain-text explanation of the matrix for the Rovo agent (it rewrites it for the user). */
 export function explainForAgent(matrix, { project, version } = {}) {
   const s = matrix.summary;

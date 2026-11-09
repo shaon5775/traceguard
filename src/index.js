@@ -46,7 +46,7 @@ function projectKeyFrom(payload) {
 }
 
 /** Read every TraceGuard issue (requirements, tests, risks) of a project, following pagination. */
-async function fetchTraceIssues(projectKey) {
+export async function fetchTraceIssues(projectKey) {
   const issues = [];
   let nextPageToken;
   do {
