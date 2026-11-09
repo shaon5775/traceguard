@@ -1,0 +1,14 @@
+{
+  "name": "traceguard",
+  "version": "1.0.0",
+  "description": "TraceGuard: audit-ready traceability agent for regulated software teams (Atlassian Forge + Rovo)",
+  "main": "index.js",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/trace.test.mjs"
+  },
+  "dependencies": {
+    "@forge/api": "^8.5.0"
+  }
+}

@@ -1,0 +1,156 @@
+modules:
+  rovo:agent:
+    - key: traceguard-agent
+      name: TraceGuard
+      description: >
+        Audit-ready traceability for regulated software teams (medical devices, pharma, automotive).
+        Builds the requirement -> test -> risk matrix from Jira, finds every gap before a release,
+        and publishes the audit report to Confluence.
+      prompt: >
+        You are TraceGuard, a quality and regulatory assistant for teams that build safety-critical software
+        (for example medical-device software under IEC 62304 and ISO 14971, or automotive software under
+        ISO 26262). You help them prove that every requirement is verified by a passing test and every risk is
+        controlled by a verified requirement, and you warn them about gaps before a release.
+
+
+        How TraceGuard data looks in Jira: requirements carry the label tg-req, tests carry tg-test, risks carry
+        tg-risk. Test results are the labels tg-pass or tg-fail (no result label means the test has not been run).
+        A requirement changed after it was tested carries tg-changed. Risk severity is a label like tg-sev-high.
+        Tests and risks are linked to the requirements they verify or that control them.
+
+
+        What to do:
+
+        - When the user asks about coverage, traceability, gaps or what is missing, call the get-traceability
+          action.
+
+        - When the user asks whether a release or version is ready, safe to ship, or a go / no-go question, call
+          the check-release-readiness action.
+
+        - When the user asks for an audit report, a traceability report, evidence for an auditor, or to publish or
+          document the results, call the publish-audit-report action and share the page link it returns.
+
+        - When the user wants to try TraceGuard, has no data yet, or asks for a demo, call the load-demo-project
+          action.
+
+        - If the user does not name a project, use the project key IPC (the demo Insulin Pump Controller). If
+          they name a release such as v2.1, pass it as the version.
+
+
+        How to answer: start with a one-line verdict (for example "NO-GO: 4 of 8 requirements verified, 3
+        high-severity risks open"). Then list the gaps grouped by type, each with its Jira key, and for each gap
+        give one concrete next step (write a test, re-run the failed test, re-test after the change, add a
+        requirement that controls the risk). Put high-severity risks first. Keep it short and specific.
+        Only use facts returned by the actions; never invent requirements, tests, results or keys. Remind the
+        user that the final release decision belongs to their quality team.
+      conversationStarters:
+        - Is IPC v2.1 ready to release?
+        - Show me the traceability gaps in IPC
+        - Publish an audit report for IPC v2.1
+        - Load the TraceGuard demo project
+      actions:
+        - get-traceability
+        - check-release-readiness
+        - publish-audit-report
+        - load-demo-project
+  action:
+    - key: get-traceability
+      name: Get traceability matrix
+      function: getTraceability
+      actionVerb: GET
+      description: >
+        Builds the requirement to test to risk traceability matrix for a Jira project (optionally one release)
+        and returns coverage numbers and every gap.
+      inputs:
+        projectKey:
+          title: Project key
+          type: string
+          required: false
+          description: The Jira project key, for example IPC. Defaults to IPC.
+        version:
+          title: Release version
+          type: string
+          required: false
+          description: Optional fix version / release name, for example v2.1.
+    - key: check-release-readiness
+      name: Check release readiness
+      function: checkReleaseReadiness
+      actionVerb: GET
+      description: >
+        Gives a go / no-go verdict for a release: every requirement verified by a passing, up-to-date test and
+        no open high-severity risk. Returns the verdict and the blocking gaps.
+      inputs:
+        projectKey:
+          title: Project key
+          type: string
+          required: false
+          description: The Jira project key, for example IPC. Defaults to IPC.
+        version:
+          title: Release version
+          type: string
+          required: false
+          description: Optional fix version / release name, for example v2.1.
+    - key: publish-audit-report
+      name: Publish audit report
+      function: publishAuditReport
+      actionVerb: CREATE
+      description: >
+        Writes the traceability matrix and risk control coverage as an audit-ready page in Confluence and
+        returns the page link.
+      inputs:
+        projectKey:
+          title: Project key
+          type: string
+          required: false
+          description: The Jira project key, for example IPC. Defaults to IPC.
+        version:
+          title: Release version
+          type: string
+          required: false
+          description: Optional fix version / release name, for example v2.1.
+        spaceKey:
+          title: Confluence space key
+          type: string
+          required: false
+          description: Optional Confluence space key. Defaults to TGAUDIT, which is created if missing.
+    - key: load-demo-project
+      name: Load demo project
+      function: loadDemoProject
+      actionVerb: CREATE
+      description: >
+        Creates the demo Jira project IPC (Insulin Pump Controller) with 8 requirements, 8 tests, 5 risks and
+        their trace links, including deliberate gaps, so the user can try TraceGuard.
+      inputs:
+        confirm:
+          title: Confirm
+          type: string
+          required: false
+          description: Not needed; any value.
+  function:
+    - key: getTraceability
+      handler: index.getTraceability
+    - key: checkReleaseReadiness
+      handler: index.checkReleaseReadiness
+    - key: publishAuditReport
+      handler: index.publishAuditReport
+    - key: loadDemoProject
+      handler: index.loadDemoProject
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
+    - read:jira-user
+    - manage:jira-project
+    - manage:jira-configuration
+    - read:confluence-space.summary
+    - write:confluence-space
+    - read:space:confluence
+    - write:space:confluence
+    - read:page:confluence
+    - write:page:confluence
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/a4a15020-c013-491b-9a66-00c2ed70623c
