@@ -126,7 +126,16 @@ modules:
           type: string
           required: false
           description: Not needed; any value.
+  jira:projectPage:
+    - key: traceguard-project-page
+      title: TraceGuard
+      resource: main
+      resolver:
+        function: page-resolver
+      render: native
   function:
+    - key: page-resolver
+      handler: resolvers.handler
     - key: getTraceability
       handler: index.getTraceability
     - key: checkReleaseReadiness
@@ -135,6 +144,9 @@ modules:
       handler: index.publishAuditReport
     - key: loadDemoProject
       handler: index.loadDemoProject
+resources:
+  - key: main
+    path: src/page.jsx
 permissions:
   scopes:
     - read:jira-work
