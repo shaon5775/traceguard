@@ -51,11 +51,11 @@ function requirementTable(rows) {
   return {
     head: {
       cells: [
-        { key: 'req', content: 'Requirement' },
-        { key: 'summary', content: 'Summary' },
-        { key: 'tests', content: 'Verified by' },
-        { key: 'risks', content: 'Controls risk' },
-        { key: 'status', content: 'Status' },
+        { key: 'req', content: 'Requirement', width: 9 },
+        { key: 'summary', content: 'Summary', width: 27 },
+        { key: 'tests', content: 'Verified by', width: 18 },
+        { key: 'risks', content: 'Controls risk', width: 16 },
+        { key: 'status', content: 'Status', width: 30 },
       ],
     },
     rows: rows.map((r) => ({
@@ -68,7 +68,7 @@ function requirementTable(rows) {
           content: r.tests.length ? (
             <Stack space="space.050">
               {r.tests.map((t) => (
-                <Inline key={t.key} space="space.100" alignBlock="center">
+                <Inline key={t.key} space="space.100" alignBlock="center" shouldWrap>
                   <IssueLink id={t.key} />
                   <Lozenge appearance={RESULT[t.result].look}>{RESULT[t.result].text}</Lozenge>
                 </Inline>
@@ -83,7 +83,7 @@ function requirementTable(rows) {
           content: r.risks.length ? (
             <Stack space="space.050">
               {r.risks.map((k) => (
-                <Inline key={k.key} space="space.100" alignBlock="center">
+                <Inline key={k.key} space="space.100" alignBlock="center" shouldWrap>
                   <IssueLink id={k.key} />
                   <Lozenge appearance={SEVERITY_LOOK[k.severity] || 'default'}>{k.severity}</Lozenge>
                 </Inline>
@@ -103,11 +103,11 @@ function riskTable(risks) {
   return {
     head: {
       cells: [
-        { key: 'risk', content: 'Risk' },
-        { key: 'summary', content: 'Hazard' },
-        { key: 'sev', content: 'Severity' },
-        { key: 'by', content: 'Controlled by' },
-        { key: 'status', content: 'Status' },
+        { key: 'risk', content: 'Risk', width: 8 },
+        { key: 'summary', content: 'Hazard', width: 32 },
+        { key: 'sev', content: 'Severity', width: 10 },
+        { key: 'by', content: 'Controlled by', width: 16 },
+        { key: 'status', content: 'Status', width: 34 },
       ],
     },
     rows: risks.map((k) => ({
