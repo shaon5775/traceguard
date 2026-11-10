@@ -23,6 +23,11 @@ TraceGuard reads the links your team already keeps in Jira and answers in second
 | **Rovo chat → TraceGuard agent** | Ask in plain English; the agent calls TraceGuard's actions and explains the result |
 | **Jira project → TraceGuard tab** | Red/green verdict box, 6 key numbers, requirement matrix, risk table, release picker, Refresh and **Publish audit report** buttons |
 | **Confluence → "TraceGuard Audit Reports" space** | Dated audit pages with the verdict, matrix and risk tables |
+| **Any MCP client (Rovo Studio agents, Claude, Cursor, …)** | The same checks as MCP tools through the Rovo MCP server (`rovo:mcp` module): `get-traceability`, `check-release-readiness`, `publish-audit-report` |
+
+**MCP setup (optional):** a site/org admin enables external MCP access for TraceGuard in Atlassian Administration;
+then connect your MCP client to `https://mcp.atlassian.com/forge/a4a15020-c013-491b-9a66-00c2ed70623c` (OAuth 2.1).
+Tools run as the signed-in user, with that user's permissions. (Rovo MCP is in Preview.)
 
 ## How it works
 
@@ -33,7 +38,7 @@ TraceGuard reads the links your team already keeps in Jira and answers in second
 | `src/resolvers.js` | Backend for the Jira page (`getMatrix`, `publish`) |
 | `src/page.jsx` | The Jira project page, built with Forge UI Kit (`@forge/react`) |
 | `src/demo.js` | Synthetic demo project "Insulin Pump Controller" (8 requirements, 8 tests, 5 risks, deliberate gaps) |
-| `manifest.yml` | Rovo agent, 4 actions, the `jira:projectPage` module and the scopes |
+| `manifest.yml` | Rovo agent, 4 actions, the `rovo:mcp` server (3 actions as MCP tools), the `jira:projectPage` module and the scopes |
 | `test/trace.test.mjs` | Offline test of the engine and the page model on the demo data |
 
 **Data model (works on any Jira site, no custom fields):** labels `tg-req`, `tg-test`, `tg-risk`; test results

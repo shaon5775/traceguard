@@ -126,6 +126,13 @@ modules:
           type: string
           required: false
           description: Not needed; any value.
+  rovo:mcp:
+    - key: traceguard-mcp
+      name: TraceGuard
+      tools:
+        - get-traceability
+        - check-release-readiness
+        - publish-audit-report
   jira:projectPage:
     - key: traceguard-project-page
       title: TraceGuard
